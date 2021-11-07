@@ -1,34 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Middleware and Supabase
 
-## Getting Started
+This app demonstrates how new Next.js 12 middleware works along supabase auth. `pages/index.tsx` 
+is responsible for login logout using supabase js lib (client side). Once user
+logged in, it calls `pages/api/setAuth.ts` to set a server-side cookie containing supabase JWT token.
 
-First, run the development server:
+Every page inside `pages/app/` is filtered by `pages/app/_middleware.ts` 
+(see [how Next.js middleware works](https://nextjs.org/docs/middleware)). Middlware validates supabase JWT token (by calling supabase
+API). If the token is absent (cookie has not been set) or is invalid (auth expired or someone
+doing somthing nasty), user will be redirected to login page. Thus all pages in the `/app` is accesible
+only by authorised users
 
-```bash
-npm run dev
-# or
-yarn dev
+## The bug
+
+This code doesn't work. `supabase.auth.api.getUserByCookie` tries to access `XMLHttpRequest` which
+is not present in server-side env:
+
+```
+Authorization error, redirecting to login page ReferenceError: XMLHttpRequest is not defined
+    at eval (webpack-internal:///./node_modules/cross-fetch/dist/browser-ponyfill.js?d2fb:462:17)
+    at new Promise (<anonymous>)
+    at fetch (webpack-internal:///./node_modules/cross-fetch/dist/browser-ponyfill.js?d2fb:455:12)
+    at eval (webpack-internal:///./node_modules/@supabase/gotrue-js/dist/module/lib/fetch.js?85f4:44:63)
+    at new Promise (<anonymous>)
+    at eval (webpack-internal:///./node_modules/@supabase/gotrue-js/dist/module/lib/fetch.js?85f4:43:16)
+    at Generator.next (<anonymous>)
+    at eval (webpack-internal:///./node_modules/@supabase/gotrue-js/dist/module/lib/fetch.js?85f4:16:71)
+    at new Promise (<anonymous>)
+    at __awaiter (webpack-internal:///./node_modules/@supabase/gotrue-js/dist/module/lib/fetch.js?85f4:12:12)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To fix that replace `user = await supabase.auth.api.getUserByCookie(req)`
+with `let user = getUserByCookie(req)` and uncomment `getUser` function. 
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Getting user server-side
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+See `pages/app/hidden-ssr-user.tsx`. In this example supabase user is obtained during page
+server-side rendering. Since `pages/app/middleware.ts` has already validated the user.
+We don't need to verify JWT with supabase server call, we can just decode JWT
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Having user on getServerSideProps we pre-build some data on server (e.g. query user settings
+from DB). And we will save an extra request to subapase server client-side
 
-## Learn More
+## Another bug
 
-To learn more about Next.js, take a look at the following resources:
+After logging out (by pressing logout button on `/`) `/app/hidden` and `/app/hidden-ssr-user` continue to work. Seems
+like JWT validation works by some reason despite the fact supabase `/logout` has been called.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+It will make sense to address that bug after first bug is fixed
