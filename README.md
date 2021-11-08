@@ -2,7 +2,8 @@
 
 This app demonstrates how new Next.js 12 middleware works along supabase auth. `pages/index.tsx` 
 is responsible for login logout using supabase js lib (client side). Once user
-logged in, it calls `pages/api/setAuth.ts` to set a server-side cookie containing supabase JWT token.
+logged in, it calls `pages/api/set.ts` to set a server-side cookie containing supabase JWT token.
+After logout, `pages/api/remove.ts` is called to clear JWT cookie
 
 Every page inside `pages/app/` is filtered by `pages/app/_middleware.ts` 
 (see [how Next.js middleware works](https://nextjs.org/docs/middleware)). Middlware validates supabase JWT token (by calling supabase
@@ -40,10 +41,3 @@ We don't need to verify JWT with supabase server call, we can just decode JWT
 
 Having user on getServerSideProps we pre-build some data on server (e.g. query user settings
 from DB). And we will save an extra request to subapase server client-side
-
-## Another bug
-
-After logging out (by pressing logout button on `/`) `/app/hidden` and `/app/hidden-ssr-user` continue to work. Seems
-like JWT validation works by some reason despite the fact supabase `/logout` has been called.
-
-It will make sense to address that bug after first bug is fixed

@@ -11,7 +11,7 @@ const Login: NextPage = () => {
     supabase.auth.onAuthStateChange(async (event, session) => {
       let newUser = supabase.auth.user()
       if (newUser) {
-        await fetch("/api/setAuth", {
+        await fetch("/api/auth/set", {
           method: "POST",
           headers: new Headers({ "Content-Type": "application/json" }),
           credentials: "same-origin",
@@ -37,6 +37,10 @@ const Login: NextPage = () => {
               setLoading(true)
               try {
                 await supabase.auth.signOut()
+                await fetch("/api/auth/remove", {
+                  method: "GET",
+                  credentials: "same-origin"
+                })
               } finally {
                 setLoading(false)
               }
