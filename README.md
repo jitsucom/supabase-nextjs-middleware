@@ -30,10 +30,13 @@ Authorization error, redirecting to login page ReferenceError: XMLHttpRequest is
     at __awaiter (webpack-internal:///./node_modules/@supabase/gotrue-js/dist/module/lib/fetch.js?85f4:12:12)
 ```
 
-To fix that replace `user = await supabase.auth.api.getUserByCookie(req)`
-with `let user = getUserByCookie(req)` and uncomment `getUser` function. 
+### Workaround
 
-## Getting user server-side
+To fix the bug, replace `user = await supabase.auth.api.getUserByCookie(req)`
+with `let user = getUserByCookie(req)` in `pages/app/_middleware.ts`. `getUser()` calls supabase API
+directly
+
+## Getting user in server-side code
 
 See `pages/app/hidden-ssr-user.tsx`. In this example supabase user is obtained during page
 server-side rendering. Since `pages/app/middleware.ts` has already validated the user.
