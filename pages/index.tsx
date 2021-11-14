@@ -29,8 +29,7 @@ const Login: NextPage = () => {
         <>
           <h1>Welcome, {user.email}!</h1>
           <div>
-            Now you can see hidden pages: <Link href="/app/hidden">/hidden</Link> and{" "}
-            <Link href="/app/hidden-ssr-user">/hidden-ssr-user</Link>
+            Now you can see hidden pages: <Link href="/app/hidden">/hidden-page</Link>
           </div>
           <button
             onClick={async () => {

@@ -4,9 +4,11 @@ import { NextResponse } from "next/server"
 
 
 export async function middleware(req: NextRequest, ev: NextFetchEvent) {
-  //This line won't work, see README.md
+  //The line below isn't working as expected, see README.tx
   //let authResult = await supabase.auth.api.getUserByCookie(req)
-  let authResult = await getUser(req) //- uncomment to get the bug fixed
+
+  let authResult = await getUser(req)
+
   if (authResult.error) {
     console.log("Authorization error, redirecting to login page", authResult.error)
     return NextResponse.redirect(`/?ret=${encodeURIComponent(req.nextUrl.pathname)}`)
