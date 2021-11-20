@@ -1,6 +1,6 @@
 # Next.js Middleware and Supabase
 
-_(read the blog post about this example)_
+_([read the blog post about this example](https://jitsu.com/blog/supabase-nextjs-middleware))_
 
 This app demonstrates how new Next.js 12 middleware works along supabase auth. `pages/index.tsx` 
 is responsible for login logout using supabase-js lib (client side). Once user
