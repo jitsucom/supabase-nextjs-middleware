@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.28.0",
@@ -19,6 +20,8 @@
   "devDependencies": {
     "@types/node": "16.11.6",
     "@types/react": "17.0.33",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.4.1",
     "typescript": "4.4.4"
   }

@@ -57,14 +57,14 @@ const Login: NextPage = () => {
               setLoading(true)
               try {
                 await supabase.auth.signIn({
-                  provider: "google",
+                  provider: "github",
                 })
               } finally {
                 setLoading(false)
               }
             }}
           >
-            Login with Google
+            Login with GitHub
           </button>
         </>
       )}
